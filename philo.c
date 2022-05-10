@@ -12,39 +12,66 @@
 
 #include "philo.h"
 
-int c = 0;
-pthread_mutex_t  mutex;
-void	*routine()
+void	parsing(t_data **vars, char **av)
 {
-	int i = 0;
-//	int c = *(int*)cd;
-	while (i < 10000000)
-	{
-		pthread_mutex_lock(&mutex);
-		c++;
-		pthread_mutex_unlock(&mutex);
-		i++;
-	}
-	return NULL;
+	(*vars)->n_of_philo = atoi(av[1]);
+	(*vars)->time_to_die = atoi(av[2]);
+	(*vars)->time_to_eat = atoi(av[3]);
+	(*vars)->time_to_sleep = atoi(av[4]);
 }
 
-int	main(int argc, char **argv)
+void	*rout(void	*arg)
 {
-	int i =0;
-	pthread_t id[2];
-	pthread_mutex_init(&mutex, NULL);
-	while (i < 3)
+	t_data *var;
+
+	var = (*t_data)arg;
+
+	return NULL;
+}
+void	philos(t_data *vars)
+{
+	int i;
+	pthread_t id[vars->n_of_philo];
+
+	i = 0;
+	if(!gettimeofday(&vars->time, NULL))
 	{
-		pthread_create(id + i, NULL, &routine, &i);
-		printf("thread is created %d\n" , i);
+		printf("err in gettimeofday\n");
+		return ;
+	}
+	vars->sec = (vars->time.tv_sec * 1000) + (vars->time.tv_usec/1000);
+
+	while (i < vars->n_of_philo)
+	{
+		if (pthread_create(id + i, NULL, &rout, vars) == 0)
+		{
+			printf("err in creating thread");
+			return;
+		}
+		vars = malloc(sizeof(t_data));
+		if (!vars)
+		{
+			return 1;
+		}
+		parsing(&vars, av);
 		i++;
 	}
-	for (int j = 0; j < 3; j++)
-	{
-		pthread_join(id[j], NULL);
-		printf("thread is joind %d\n", j);
+}
+int	main(int ac, char **av)
+{
+	t_data *vars;
+
+	if (ac == 5) {
+		vars = malloc(sizeof(t_data));
+		if (!vars)
+		{
+			return 1;
+		}
+		parsing(&vars, av);
+		philos(vars);
 	}
-	printf("%d\n", c);
+	else
+		printf("err arg should contains 4 args\n");
 	return (0);
 }
 

@@ -1,36 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo.h                                            :+:      :+:    :+:   */
+/*   ft_isdigit.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ael-mous <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/04/17 15:42:32 by ael-mous          #+#    #+#             */
-/*   Updated: 2022/04/17 15:42:34 by ael-mous         ###   ########.fr       */
+/*   Created: 2022/05/09 16:43:30 by ael-mous          #+#    #+#             */
+/*   Updated: 2022/05/09 16:43:33 by ael-mous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHILO_H
-# define PHILO_H
+#include "philo.h"
 
-# include <stdio.h>
-# include <pthread.h>
-#include <sys/time.h>
-# include <stdlib.h>
-
-typedef struct s_ph_staffs
+int	ft_isdigit(int c)
 {
-	time_t 	sec;
-	time_t	ms;
-	int	n_of_philo;
-	int time_to_die;
-	int	time_to_eat;
-	int	time_to_sleep;
-	int state;
-	int	forks;
-	struct timeval time;
-	int	*ph;
-}	t_data;
-int	ft_isdigit(int c);
-
-#endif
+	if (c >= 48 && c <= 57)
+		return (1);
+	else
+		return (0);
+}
