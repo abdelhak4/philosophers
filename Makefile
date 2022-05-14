@@ -1,8 +1,8 @@
 NAME = philo
 SRCS = philo.c\
-	ft_isdigit.c
+	ft_atoi.c philo_utlis.c
 $(NAME) : $(SRCS)
-	CC -pthread $(SRCS) -g -o $(NAME)
+	CC -pthread -fsanitize=address  $(SRCS) -g -o $(NAME)
 all : $(NAME)
 clean :
 	rm $(NAME)

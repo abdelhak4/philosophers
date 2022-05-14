@@ -14,46 +14,59 @@
 
 void	parsing(t_data **vars, char **av)
 {
-	(*vars)->n_of_philo = atoi(av[1]);
-	(*vars)->time_to_die = atoi(av[2]);
-	(*vars)->time_to_eat = atoi(av[3]);
-	(*vars)->time_to_sleep = atoi(av[4]);
+	(*vars)->n_of_philo = ft_atoi(av[1]);
+	(*vars)->time_to_die = ft_atoi(av[2]);
+	(*vars)->time_to_eat = ft_atoi(av[3]);
+	(*vars)->time_to_sleep = ft_atoi(av[4]);
+	//(*vars)->n_time_to_each_ph_to_eat = ft_atoi(av[5]);
 }
-
 void	*rout(void	*arg)
 {
-	t_data *var;
+	int 	add;
+	t_data	*var;
 
-	var = (*t_data)arg;
-
+	var = (t_data*)arg;
+	if (var->state == 0)
+	{
+		printing_msg(var, 0, var->ph[var->i]);
+		printing_msg(var, 3,var->ph[var->i]);
+	}
 	return NULL;
 }
-void	philos(t_data *vars)
+/*
+ *     here I created threads
+ */
+void	philos(t_data *vars, char **av)
 {
 	int i;
+	int j;
 	pthread_t id[vars->n_of_philo];
+	pthread_mutex_t	fork_lock[vars->n_of_philo];
 
 	i = 0;
-	if(!gettimeofday(&vars->time, NULL))
-	{
-		printf("err in gettimeofday\n");
-		return ;
-	}
-	vars->sec = (vars->time.tv_sec * 1000) + (vars->time.tv_usec/1000);
-
+	j = -1;
+	vars->ph = malloc(vars->n_of_philo * sizeof(int));
+	gettimeofday(&vars->time, NULL);
+	/*
+	 ? init time var
+	 */
+	vars->Start_t = m_time(vars);
+	vars->End_t = m_time(vars);
+	pthread_mutex_init(&vars->lock, NULL);
+	while (++j < vars->n_of_philo)
+		pthread_mutex_init(&fork_lock[j], NULL);
+	vars->state = 0;
+	vars->fork_lock = fork_lock;
 	while (i < vars->n_of_philo)
 	{
-		if (pthread_create(id + i, NULL, &rout, vars) == 0)
+		vars->ph[i] = i + 1;
+		vars->i = i;
+		if (pthread_create(id + i, NULL, &rout, vars) != 0)
 		{
 			printf("err in creating thread");
-			return;
+			return ;
 		}
-		vars = malloc(sizeof(t_data));
-		if (!vars)
-		{
-			return 1;
-		}
-		parsing(&vars, av);
+		usleep(100);
 		i++;
 	}
 }
@@ -68,7 +81,7 @@ int	main(int ac, char **av)
 			return 1;
 		}
 		parsing(&vars, av);
-		philos(vars);
+		philos(vars, av);
 	}
 	else
 		printf("err arg should contains 4 args\n");
