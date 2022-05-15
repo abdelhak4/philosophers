@@ -11,7 +11,11 @@
 /* ************************************************************************** */
 
 #include "philo.h"
-
+/*
+ *
+ 		! "Note" TODO : handle max int and min int in ft_atoi.c
+ *
+ */
 void	parsing(t_data **vars, char **av)
 {
 	(*vars)->n_of_philo = ft_atoi(av[1]);
@@ -22,21 +26,25 @@ void	parsing(t_data **vars, char **av)
 }
 void	*rout(void	*arg)
 {
-	int 	add;
 	t_data	*var;
 
 	var = (t_data*)arg;
 	if (var->state == 0)
 	{
-		printing_msg(var, 0, var->ph[var->i]);
+		printing_msg(var, 1, var->ph[var->i]);
 		printing_msg(var, 3,var->ph[var->i]);
+		down_forks(var, var->ph[var->i], var->ph[var->i+1]);
+	}
+	if (var->state == 1)
+	{
+		printing_msg(var, 2, var->ph[var->i]);
 	}
 	return NULL;
 }
 /*
  *     here I created threads
  */
-void	philos(t_data *vars, char **av)
+void	philo(t_data *vars, char **av)
 {
 	int i;
 	int j;
@@ -46,18 +54,18 @@ void	philos(t_data *vars, char **av)
 	i = 0;
 	j = -1;
 	vars->ph = malloc(vars->n_of_philo * sizeof(int));
-	gettimeofday(&vars->time, NULL);
 	/*
-	 ? init time var
+	 ? init time variables
 	 */
-	vars->Start_t = m_time(vars);
-	vars->End_t = m_time(vars);
 	pthread_mutex_init(&vars->lock, NULL);
-	while (++j < vars->n_of_philo)
+	while (++j < vars->n_of_philo) {
 		pthread_mutex_init(&fork_lock[j], NULL);
+	}
 	vars->state = 0;
 	vars->fork_lock = fork_lock;
-	while (i < vars->n_of_philo)
+	vars->Start_t = m_time(vars);
+	vars->End_t = m_time(vars);
+	while (i-1 < vars->n_of_philo)
 	{
 		vars->ph[i] = i + 1;
 		vars->i = i;
@@ -69,7 +77,20 @@ void	philos(t_data *vars, char **av)
 		usleep(100);
 		i++;
 	}
+	j = 0;
+	if (vars->die == -1)
+		return;
+	while (j < vars->n_of_philo)
+	{
+		if (pthread_join(*(id + j), NULL) != 0)
+		{
+			printf("err in creating thread");
+			return ;
+		}
+		j++;
+	}
 }
+
 int	main(int ac, char **av)
 {
 	t_data *vars;
@@ -81,7 +102,7 @@ int	main(int ac, char **av)
 			return 1;
 		}
 		parsing(&vars, av);
-		philos(vars, av);
+		philo(vars, av);
 	}
 	else
 		printf("err arg should contains 4 args\n");
