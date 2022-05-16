@@ -17,13 +17,16 @@
  *
  */
 
-void	parsing(t_data **vars, char **av)
+void	parsing(t_data **vars, char **av, int ac)
 {
 	(*vars)->n_of_philo = ft_atoi(av[1]);
 	(*vars)->time_to_die = ft_atoi(av[2]);
 	(*vars)->time_to_eat = ft_atoi(av[3]);
 	(*vars)->time_to_sleep = ft_atoi(av[4]);
-	//(*vars)->n_time_to_each_ph_to_eat = ft_atoi(av[5]);
+	if (ac == 6)
+		(*vars)->n_time_to_each_ph_to_eat = ft_atoi(av[5]);
+	else
+		(*vars)->n_time_to_each_ph_to_eat = -1;
 }
 
 void	is_eating(t_data *var, int ph)
@@ -51,9 +54,11 @@ void	is_thinking(t_data *var, int ph)
 	usleep(var->time_to_sleep * 1000);
 }
 
-void	check_for_die(t_data *var)
+int	check_for_die(t_data *var)
 {
-
+	if (var->t > var->time_to_die)
+		return 0;
+	return 1;
 }
 
 void	*rout(void	*arg)
@@ -61,49 +66,41 @@ void	*rout(void	*arg)
 	t_data	*var;
 
 	var = (t_data*)arg;
-	while (check_for_die(var))
+	while (!check_for_die(var))
 	{
-		var->Start_t = m_time(var);
-		is_eating(var, var->ph[var->i]);
-		is_sleeping(var, var->ph[var->i]);
-		is_thinking(var, var->ph[var->i]);
-		var->End_t = m_time(var);
+		is_eating(var, var->ph);
+		is_sleeping(var, var->ph);
+		is_thinking(var, var->ph);
 	}
 	return NULL;
 }
-/*
- *     here I created threads
- */
+
 void	philo(t_data *vars, char **av)
 {
 	int	i;
 	int	j;
-	pthread_t id[vars->n_of_philo];
+	pthread_t		id[vars->n_of_philo];
 	pthread_mutex_t	fork_lock[vars->n_of_philo];
 
 	i = 0;
 	j = -1;
-	vars->ph = malloc(vars->n_of_philo * sizeof(int));
-	/*
-	 ? init time variables
-	 */
 	pthread_mutex_init(&vars->lock, NULL);
 	while (++j < vars->n_of_philo) {
 		pthread_mutex_init(&fork_lock[j], NULL);
 	}
 	vars->state = 0;
 	vars->fork_lock = fork_lock;
-	vars->End_t = m_time(vars);
 	while (i < vars->n_of_philo)
 	{
-		vars->ph[i] = i + 1;
+		vars->ph = i + 1;
 		vars->i = i;
+		vars->eat = 0;
 		if (pthread_create(id + i, NULL, &rout, vars) != 0)
 		{
 			printf("err in creating thread");
 			return ;
 		}
-		usleep(1000);
+		usleep(100);
 		i++;
 	}
 	j = 0;
@@ -131,7 +128,8 @@ int	main(int ac, char **av)
 		{
 			return 1;
 		}
-		parsing(&vars, av);
+		parsing(&vars, av, ac);
+		vars->Start_t = m_time(vars);
 		philo(vars, av);
 	}
 	else

@@ -14,7 +14,7 @@ unsigned long m_time(t_data *vars)
 
 void	print_msg(t_data *var, int ph, char *str)
 {
-	var->t = var->End_t - var->Start_t;
+	var->t = m_time(var) - var->Start_t;
 	printf("%ld ms ", var->t);
 	printf("%d %s\n", ph, str);
 }
