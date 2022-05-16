@@ -16,6 +16,7 @@
  		! "Note" TODO : handle max int and min int in ft_atoi.c
  *
  */
+
 void	parsing(t_data **vars, char **av)
 {
 	(*vars)->n_of_philo = ft_atoi(av[1]);
@@ -24,20 +25,49 @@ void	parsing(t_data **vars, char **av)
 	(*vars)->time_to_sleep = ft_atoi(av[4]);
 	//(*vars)->n_time_to_each_ph_to_eat = ft_atoi(av[5]);
 }
+
+void	is_eating(t_data *var, int ph)
+{
+	pthread_mutex_lock(&var->fork_lock[ph]);
+	print_msg(var, ph, "has taken a fork");
+	pthread_mutex_lock(&var->fork_lock[ph + 1]);
+	print_msg(var, ph, "has taken a fork");
+	pthread_mutex_lock(&var->lock);
+	print_msg(var, ph, "is eating");
+	usleep(var->time_to_eat * 1000);
+	pthread_mutex_unlock(&var->lock);
+	down_forks(var, ph, ph +1);
+}
+
+void	is_sleeping(t_data *var, int ph)
+{
+	print_msg(var, ph, "is sleeping");
+	usleep(var->time_to_sleep * 1000);
+}
+
+void	is_thinking(t_data *var, int ph)
+{
+	print_msg(var, ph, "is thinking");
+	usleep(var->time_to_sleep * 1000);
+}
+
+void	check_for_die(t_data *var)
+{
+
+}
+
 void	*rout(void	*arg)
 {
 	t_data	*var;
 
 	var = (t_data*)arg;
-	if (var->state == 0)
+	while (check_for_die(var))
 	{
-		printing_msg(var, 1, var->ph[var->i]);
-		printing_msg(var, 3,var->ph[var->i]);
-		down_forks(var, var->ph[var->i], var->ph[var->i+1]);
-	}
-	if (var->state == 1)
-	{
-		printing_msg(var, 2, var->ph[var->i]);
+		var->Start_t = m_time(var);
+		is_eating(var, var->ph[var->i]);
+		is_sleeping(var, var->ph[var->i]);
+		is_thinking(var, var->ph[var->i]);
+		var->End_t = m_time(var);
 	}
 	return NULL;
 }
@@ -46,8 +76,8 @@ void	*rout(void	*arg)
  */
 void	philo(t_data *vars, char **av)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 	pthread_t id[vars->n_of_philo];
 	pthread_mutex_t	fork_lock[vars->n_of_philo];
 
@@ -63,9 +93,8 @@ void	philo(t_data *vars, char **av)
 	}
 	vars->state = 0;
 	vars->fork_lock = fork_lock;
-	vars->Start_t = m_time(vars);
 	vars->End_t = m_time(vars);
-	while (i-1 < vars->n_of_philo)
+	while (i < vars->n_of_philo)
 	{
 		vars->ph[i] = i + 1;
 		vars->i = i;
@@ -74,10 +103,11 @@ void	philo(t_data *vars, char **av)
 			printf("err in creating thread");
 			return ;
 		}
-		usleep(100);
+		usleep(1000);
 		i++;
 	}
 	j = 0;
+	//  TODO : check if philo not die !!
 	if (vars->die == -1)
 		return;
 	while (j < vars->n_of_philo)

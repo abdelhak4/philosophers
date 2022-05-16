@@ -45,7 +45,7 @@ typedef struct s_ph_staffs
 }	t_data;
 void	down_forks(t_data *var, int f_right, int f_left);
 int		ft_atoi(const char *str);
-void	printing_msg(t_data *var, int state, int ph);
+void	print_msg(t_data *var, int ph, char *str);
 unsigned long m_time(t_data *vars);
 
 #endif
