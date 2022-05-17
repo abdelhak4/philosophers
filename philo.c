@@ -17,84 +17,33 @@
  *
  */
 
-void	parsing(t_data **vars, char **av, int ac)
-{
-	(*vars)->n_of_philo = ft_atoi(av[1]);
-	(*vars)->time_to_die = ft_atoi(av[2]);
-	(*vars)->time_to_eat = ft_atoi(av[3]);
-	(*vars)->time_to_sleep = ft_atoi(av[4]);
-	if (ac == 6)
-		(*vars)->n_time_to_each_ph_to_eat = ft_atoi(av[5]);
-	else
-		(*vars)->n_time_to_each_ph_to_eat = -1;
-}
-
-void	is_eating(t_data *var, int ph)
-{
-	pthread_mutex_lock(&var->fork_lock[ph]);
-	print_msg(var, ph, "has taken a fork");
-	pthread_mutex_lock(&var->fork_lock[ph + 1]);
-	print_msg(var, ph, "has taken a fork");
-	pthread_mutex_lock(&var->lock);
-	print_msg(var, ph, "is eating");
-	usleep(var->time_to_eat * 1000);
-	pthread_mutex_unlock(&var->lock);
-	down_forks(var, ph, ph +1);
-}
-
-void	is_sleeping(t_data *var, int ph)
-{
-	print_msg(var, ph, "is sleeping");
-	usleep(var->time_to_sleep * 1000);
-}
-
-void	is_thinking(t_data *var, int ph)
-{
-	print_msg(var, ph, "is thinking");
-	usleep(var->time_to_sleep * 1000);
-}
-
-int	check_for_die(t_data *var)
-{
-	if (var->t > var->time_to_die)
-		return 0;
-	return 1;
-}
-
 void	*rout(void	*arg)
 {
 	t_data	*var;
 
 	var = (t_data*)arg;
-	while (!check_for_die(var))
+	while (check_for_die(var))
 	{
-		is_eating(var, var->ph);
-		is_sleeping(var, var->ph);
-		is_thinking(var, var->ph);
+		is_eating(var, var->philo->ph);
+		is_sleeping(var, var->philo->ph);
+		is_thinking(var, var->philo->ph);
 	}
 	return NULL;
 }
 
 void	philo(t_data *vars, char **av)
 {
-	int	i;
-	int	j;
+	int				i;
+	int				j;
 	pthread_t		id[vars->n_of_philo];
-	pthread_mutex_t	fork_lock[vars->n_of_philo];
 
 	i = 0;
-	j = -1;
-	pthread_mutex_init(&vars->lock, NULL);
-	while (++j < vars->n_of_philo) {
-		pthread_mutex_init(&fork_lock[j], NULL);
-	}
-	vars->state = 0;
-	vars->fork_lock = fork_lock;
+	if ((vars->philo = malloc(sizeof(t_ph) * vars->n_of_philo)))
+		return;
+	(*vars).philo->Start_t = m_time(vars);
 	while (i < vars->n_of_philo)
 	{
-		vars->ph = i + 1;
-		vars->i = i;
-		vars->eat = 0;
+		vars_init(vars, i);
 		if (pthread_create(id + i, NULL, &rout, vars) != 0)
 		{
 			printf("err in creating thread");
@@ -104,8 +53,7 @@ void	philo(t_data *vars, char **av)
 		i++;
 	}
 	j = 0;
-	//  TODO : check if philo not die !!
-	if (vars->die == -1)
+	if (check_for_die(vars) == 0)
 		return;
 	while (j < vars->n_of_philo)
 	{
@@ -118,6 +66,21 @@ void	philo(t_data *vars, char **av)
 	}
 }
 
+void	init_mutex(t_data **vars)
+{
+	int				j;
+	pthread_mutex_t	fork_lock[(*vars)->n_of_philo];
+
+
+	j = -1;
+	pthread_mutex_init(&(*vars)->lock, NULL);
+	pthread_mutex_init(&(*vars)->write, NULL);
+	while (++j < (*vars)->n_of_philo)
+		pthread_mutex_init(&fork_lock[j], NULL);
+	(*vars)->fork_lock = fork_lock;
+
+}
+
 int	main(int ac, char **av)
 {
 	t_data *vars;
@@ -126,14 +89,14 @@ int	main(int ac, char **av)
 		vars = malloc(sizeof(t_data));
 		if (!vars)
 		{
-			return 1;
+			return (1);
 		}
 		parsing(&vars, av, ac);
-		vars->Start_t = m_time(vars);
+		init_mutex(&vars);
 		philo(vars, av);
 	}
 	else
-		printf("err arg should contains 4 args\n");
+		printf("err arg should contains 4 args at least\n");
 	return (0);
 }
 

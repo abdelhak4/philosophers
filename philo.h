@@ -20,30 +20,43 @@
 # include <stdbool.h>
 # include <unistd.h>
 
-typedef struct s_ph_staffs
+typedef struct philosophers
 {
-	int				n_of_philo;
-	pthread_mutex_t	lock;
-	pthread_mutex_t	*fork_lock;
-	int 			state;
-	struct timeval	time;
-
-	time_t 			sec;
-	time_t			ms;
+	int 			r_fork;
 	int				i;
 	int 			die;
 	time_t			Start_t;
 	time_t			t;
 	int 			eat;
+	int 			eat_times;
+	int				ph;
+
+}	t_ph;
+typedef struct s_ph_staffs
+{
+	int				n_of_philo;
+	pthread_mutex_t	lock;
+	pthread_mutex_t	write;
+	pthread_mutex_t	*fork_lock;
+	struct timeval	time;
+	time_t 			sec;
+	time_t			ms;
 	int 			n_time_to_each_ph_to_eat;
 	int 			time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
-	int				ph;
+	t_ph			*philo;
 }	t_data;
+
+void 	vars_init(t_data *vars, int i);
+void	parsing(t_data **vars, char **av, int ac);
 void	down_forks(t_data *var, int f_right, int f_left);
 int		ft_atoi(const char *str);
 void	print_msg(t_data *var, int ph, char *str);
-unsigned long m_time(t_data *vars);
+time_t	m_time(t_data *vars);
+int		check_for_die(t_data *var);
+void	is_thinking(t_data *var, int ph);
+void	is_sleeping(t_data *var, int ph);
+void	is_eating(t_data *var, int ph);
 
 #endif
