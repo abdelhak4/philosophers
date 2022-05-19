@@ -23,37 +23,35 @@
 typedef struct philosophers
 {
 	int 			r_fork;
-	int				i;
+	int 			l_fork;
 	int 			die;
-	time_t			Start_t;
-	time_t			t;
 	int 			eat;
 	int 			eat_times;
 	int				ph;
-
+	time_t			t;
 }	t_ph;
+
 typedef struct s_ph_staffs
 {
 	int				n_of_philo;
+	int				i;
+	time_t			Start_t;
 	pthread_mutex_t	lock;
 	pthread_mutex_t	write;
 	pthread_mutex_t	*fork_lock;
-	struct timeval	time;
-	time_t 			sec;
-	time_t			ms;
 	int 			n_time_to_each_ph_to_eat;
 	int 			time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
-	t_ph			*philo;
+	t_ph			*s_ph;
 }	t_data;
 
-void 	vars_init(t_data *vars, int i);
+t_ph 	vars_init(t_data *vars, int i);
 void	parsing(t_data **vars, char **av, int ac);
-void	down_forks(t_data *var, int f_right, int f_left);
+void	down_forks(t_data **var, int ph);
 int		ft_atoi(const char *str);
 void	print_msg(t_data *var, int ph, char *str);
-time_t	m_time(t_data *vars);
+time_t	m_time();
 int		check_for_die(t_data *var);
 void	is_thinking(t_data *var, int ph);
 void	is_sleeping(t_data *var, int ph);

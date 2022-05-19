@@ -12,21 +12,22 @@ void	parsing(t_data **vars, char **av, int ac)
 		(*vars)->n_time_to_each_ph_to_eat = -1;
 }
 
-void	down_forks(t_data *var, int f_right, int f_left)
+void	down_forks(t_data **var, int ph)
 {
-	pthread_mutex_unlock(&var->fork_lock[f_right]);
-	pthread_mutex_unlock(&var->fork_lock[f_left]);
+	pthread_mutex_unlock(&(*var)->fork_lock[(*var)->s_ph[ph].l_fork]);
+	pthread_mutex_unlock(&(*var)->fork_lock[(*var)->s_ph[ph].r_fork]);
 }
 
-time_t	m_time(t_data *vars)
+time_t	m_time()
 {
-	gettimeofday(&vars->time, NULL);
-	return ((vars->time.tv_sec * 1000) + (vars->time.tv_usec/1000));
+	struct timeval time;
+	gettimeofday(&time, NULL);
+	return ((time.tv_sec * 1000) + (time.tv_usec/1000));
 }
 
 void	print_msg(t_data *var, int ph, char *str)
 {
-	var->philo->t = m_time(var) - var->philo->Start_t;
-	printf("%ld ms ", var->philo->t);
-	printf("%d %s\n", ph, str);
+	var->s_ph[ph].t = m_time() - var->Start_t;
+	printf("%ld ms ", var->s_ph->t);
+	printf("%d %s\n", ph + 1, str);
 }
