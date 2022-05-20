@@ -2,8 +2,9 @@
 
 void	my_usleep(t_data *var, time_t t)
 {
-	while (m_time() - var->Start_t <= t)
-		usleep(200);
+	time_t	t0 = m_time();
+	while (m_time() - t0 <= t)
+		usleep(10);
 }
 void	parsing(t_data **vars, char **av, int ac)
 {

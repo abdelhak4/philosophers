@@ -21,8 +21,8 @@ void	is_eating(t_data *var, int ph)
 	print_msg(var, ph, "has taken the right  fork");
 	print_msg(var, ph, "is eating");
 	var->s_ph[ph].eat_times++;
-	usleep(var->time_to_eat * 1000);
-	//my_usleep(var, var->time_to_eat);
+	//usleep(var->time_to_eat * 1000);
+	my_usleep(var, var->time_to_eat);
 	pthread_mutex_unlock(&var->s_ph[ph].fork_lock[var->s_ph[ph].l_fork]);
 	pthread_mutex_unlock(&var->s_ph[ph].fork_lock[var->s_ph[ph].r_fork]);
 }
@@ -31,7 +31,8 @@ void	is_sleeping(t_data *var, int ph)
 {
 	pthread_mutex_lock(&var->write);
 	print_msg(var, ph, "is sleeping");
-	usleep(var->time_to_sleep * 1000);
+	//usleep(var->time_to_sleep * 1000);
+	m_time(var, var->time_to_sleep);
 	pthread_mutex_unlock(&var->write);
 }
 

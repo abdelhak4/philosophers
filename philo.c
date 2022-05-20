@@ -24,8 +24,6 @@ void	*rout(void	*arg)
 
 	var = (t_data*)arg;
 	ph = var->s_ph[var->i].ph;
-	if (ph+1 % 2 != 0)
-		usleep(5);
 	while (1)
 	{
 		is_eating(var, ph);
@@ -51,10 +49,8 @@ void	philo(t_data *vars, char **av)
 		vars->s_ph[i] = vars_init(vars , i);
 		vars->i = i;
 		if (pthread_create(id + i, NULL, &rout, (void *)vars) != 0)
-		{
-			printf("err in creating thread");
-			return ;
-		}
+			if (printf("err in creating thread"))
+				return ;
 		usleep(100);
 		i++;
 	}
