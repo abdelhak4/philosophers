@@ -1,10 +1,14 @@
 #include "philo.h"
-
+/*
+ ?  my-usleep
+ ?	parsing - down_forks
+ ?	m_time print_msg
+ */
 void	my_usleep(t_data *var, time_t t)
 {
 	time_t	t0 = m_time();
 	while (m_time() - t0 <= t)
-		usleep(10);
+		usleep(50);
 }
 void	parsing(t_data **vars, char **av, int ac)
 {
@@ -20,8 +24,8 @@ void	parsing(t_data **vars, char **av, int ac)
 
 void	down_forks(t_data **var, int ph)
 {
-	pthread_mutex_unlock(&(*var)->s_ph[ph].fork_lock[(*var)->s_ph[ph].l_fork]);
-	pthread_mutex_unlock(&(*var)->s_ph[ph].fork_lock[(*var)->s_ph[ph].r_fork]);
+	pthread_mutex_unlock(&(*var)->fork[(*var)->s_ph[ph].l_fork]);
+	pthread_mutex_unlock(&(*var)->fork[(*var)->s_ph[ph].r_fork]);
 }
 
 time_t	m_time()

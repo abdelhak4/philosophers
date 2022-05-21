@@ -30,15 +30,15 @@ typedef struct philosophers
 	int				ph;
 	int				last_eat;
 	time_t			t;
-	pthread_mutex_t	*fork_lock;
+
 }	t_ph;
 
 typedef struct s_ph_staffs
 {
+	pthread_mutex_t	lock;
 	int				n_of_philo;
 	int				i;
 	time_t			Start_t;
-	pthread_mutex_t	lock;
 	pthread_mutex_t	write;
 	int 			n_time_to_each_ph_to_eat;
 	int 			time_to_die;

@@ -27,8 +27,14 @@ void	*rout(void	*arg)
 	while (1)
 	{
 		is_eating(var, ph);
+		if (check_for_die(var, ph) != 1)
+		{
+			print_msg(var, ph, "is dead");
+			var->s_ph[ph].die = -1;
+			break;
+		}
 		is_sleeping(var, ph);
-		//is_thinking(var, ph);
+		is_thinking(var, ph);
 	}
 	return NULL;
 }
@@ -37,10 +43,12 @@ void	philo(t_data *vars, char **av)
 {
 	int				i;
 	int				j;
-	pthread_t		id[vars->n_of_philo];
+	pthread_t 		*id;
 
 	i = 0;
 	j = 0;
+	if (!(id = malloc(sizeof(pthread_t) * vars->n_of_philo)))
+		return;
 	if (!(vars->s_ph = malloc(sizeof(t_ph) * vars->n_of_philo)))
 		return;
 	(*vars).Start_t = m_time(vars);
@@ -51,7 +59,7 @@ void	philo(t_data *vars, char **av)
 		if (pthread_create(id + i, NULL, &rout, (void *)vars) != 0)
 			if (printf("err in creating thread"))
 				return ;
-		usleep(100);
+		usleep	(100);
 		i++;
 	}
 	while (j < vars->n_of_philo)
