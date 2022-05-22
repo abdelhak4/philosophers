@@ -26,13 +26,17 @@ void	*rout(void	*arg)
 	ph = var->s_ph[var->i].ph;
 	while (1)
 	{
-		is_eating(var, ph);
-		if (check_for_die(var, ph) != 1)
+		if (check_for_die(var) == 0)
 		{
-			print_msg(var, ph, "is dead");
-			var->s_ph[ph].die = -1;
+			pthread_mutex_lock(&var->lock);
+			printf("limit %ld\n", var->s_ph[ph].last_eat + var->time_to_die);
+			printf("now %ld\n", m_time() - var->Start_t);
+			print_msg(var, ph, "is dead", Red);
+			var->die = -1;
+			pthread_mutex_unlock(&var->lock);
 			break;
 		}
+		is_eating(var, ph);
 		is_sleeping(var, ph);
 		is_thinking(var, ph);
 	}
@@ -52,6 +56,7 @@ void	philo(t_data *vars, char **av)
 	if (!(vars->s_ph = malloc(sizeof(t_ph) * vars->n_of_philo)))
 		return;
 	(*vars).Start_t = m_time(vars);
+	(*vars).die = 0;
 	while (i < vars->n_of_philo)
 	{
 		vars->s_ph[i] = vars_init(vars , i);
@@ -62,6 +67,7 @@ void	philo(t_data *vars, char **av)
 		usleep	(100);
 		i++;
 	}
+	check_for_die(vars)
 	while (j < vars->n_of_philo)
 	{
 		if (pthread_join(*(id + j), NULL) != 0)

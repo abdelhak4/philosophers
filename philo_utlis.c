@@ -4,12 +4,23 @@
  ?	parsing - down_forks
  ?	m_time print_msg
  */
+
 void	my_usleep(t_data *var, time_t t)
 {
+	pthread_mutex_lock(&var->lock);
 	time_t	t0 = m_time();
-	while (m_time() - t0 <= t)
-		usleep(50);
+	while (m_time() - t0 < t)
+		usleep(51);
+	pthread_mutex_unlock(&var->lock);
 }
+
+void	print_msg(t_data *var, int ph, char *str, char *clr)
+{
+	pthread_mutex_lock(&var->write);
+	printf("%s%ld ms {%d} \"%s\"\n",clr , (m_time() - var->Start_t), ph + 1, str);
+	pthread_mutex_unlock(&var->write);
+}
+
 void	parsing(t_data **vars, char **av, int ac)
 {
 	(*vars)->n_of_philo = ft_atoi(av[1]);
@@ -22,22 +33,9 @@ void	parsing(t_data **vars, char **av, int ac)
 		(*vars)->n_time_to_each_ph_to_eat = -1;
 }
 
-void	down_forks(t_data **var, int ph)
-{
-	pthread_mutex_unlock(&(*var)->fork[(*var)->s_ph[ph].l_fork]);
-	pthread_mutex_unlock(&(*var)->fork[(*var)->s_ph[ph].r_fork]);
-}
-
 time_t	m_time()
 {
 	struct timeval time;
 	gettimeofday(&time, NULL);
 	return ((time.tv_sec * 1000) + (time.tv_usec/1000));
-}
-
-void	print_msg(t_data *var, int ph, char *str)
-{
-	var->s_ph[ph].t = m_time() - var->Start_t;
-	printf("%ld ms %d %s\n", var->s_ph[ph].t, ph + 1, str);
-	var->s_ph[ph].last_eat = var->s_ph[ph].t;
 }
