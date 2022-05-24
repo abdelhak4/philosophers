@@ -12,7 +12,6 @@ t_ph 	vars_init(t_data *vars, int i)
 	vars->s_ph[i].r_fork = (i + 1) % vars->n_of_philo;
 	vars->s_ph[i].l_fork = i;
 	vars->s_ph[i].eat = 0;
-	vars->s_ph[i].t = 0;
 	vars->s_ph[i].eat_times = 0;
 	vars->s_ph[i].last_eat = 0;
 	return vars->s_ph[i];

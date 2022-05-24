@@ -35,7 +35,6 @@ typedef struct philosophers
 	size_t	eat_times;
 	size_t	ph;
 	time_t	last_eat;
-	time_t	t;
 }	t_ph;
 
 /****************************************************
@@ -49,6 +48,7 @@ typedef struct s_ph_staffs
 	time_t			start_t;
 	pthread_mutex_t	write;
 	int				die;
+	int 			is_died;
 	size_t			n_time_to_each_ph_to_eat;
 	size_t			time_to_die;
 	size_t			time_to_eat;
@@ -61,7 +61,7 @@ typedef struct s_ph_staffs
 	!***********	F U N C T I O N S	*****************
 	*****************************************************/
 
-int		died(t_data *var, int i);
+void	died(t_data *var, int i);
 void	my_usleep(t_data *var, time_t t);
 t_ph	vars_init(t_data *vars, int i);
 void	parsing(t_data **vars, char **av, int ac);

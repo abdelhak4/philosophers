@@ -26,15 +26,9 @@ void	*rout(void	*arg)
 	ph = var->s_ph[var->i].ph;
 	while (1)
 	{
-		if (died(var, ph) == 0)
-		{
-			pthread_mutex_lock(&var->lock);
-			var->die = -1;
-			print_msg(var, ph, "is died", RED);
-			pthread_mutex_unlock(&var->lock);
-			break ;
-		}
 		is_eating(var, ph);
+		if (var->is_died == 1)
+			break;
 		is_sleeping(var, ph);
 		is_thinking(var, ph);
 	}
@@ -55,6 +49,7 @@ void	philo(t_data *vars, char **av)
 		return;
 	(*vars).start_t = m_time();
 	(*vars).die = 0;
+	(*vars).is_died = 0;
 	while (i < vars->n_of_philo)
 	{
 		vars->s_ph[i] = vars_init(vars , i);
