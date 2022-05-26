@@ -21,16 +21,17 @@ void	*rout(void	*arg)
 {
 	int 	ph;
 	t_data	*var;
-
 	var = (t_data*)arg;
+	pthread_mutex_lock(&var->mut);
 	ph = var->s_ph[var->i].ph;
+	pthread_mutex_unlock(&var->mut);
 	while (1)
 	{
-		pthread_mutex_lock(&var->lock);
+		is_eating(var, ph);
+		pthread_mutex_lock(&var->mut);
 		if (var->is_died == 1)
 			break;
-		pthread_mutex_unlock(&var->lock);
-		is_eating(var, ph);
+		pthread_mutex_unlock(&var->mut);
 		is_sleeping(var, ph);
 		is_thinking(var, ph);
 	}
@@ -55,7 +56,6 @@ int	philo(t_data *vars, char **av)
 	while (i < vars->n_of_philo)
 	{
 		vars->s_ph[i] = vars_init(vars , i);
-		vars->i = i;
 		if (pthread_create(id + i, NULL, &rout, (void *)vars) != 0)
 		{
 			printf("err in creating thread");
@@ -64,8 +64,8 @@ int	philo(t_data *vars, char **av)
 		usleep (100);
 		i++;
 	}
-	if (check_for_die(vars))
-		return 0;
+	check_for_die(vars);
+	//system("leaks philo");
 	return 1;
 }
 
@@ -76,6 +76,8 @@ void	init_mutex(t_data **vars)
 	(*vars)->fork = malloc(sizeof(pthread_mutex_t) * (*vars)->n_of_philo);
 	j = -1;
 	pthread_mutex_init(&(*vars)->lock, NULL);
+	pthread_mutex_init(&(*vars)->mut, NULL);
+	pthread_mutex_init(&(*vars)->sleep, NULL);
 	pthread_mutex_init(&(*vars)->write, NULL);
 	while (++j < (*vars)->n_of_philo)
 		pthread_mutex_init(&(*vars)->fork[j], NULL);
@@ -85,13 +87,15 @@ int	main(int ac, char **av)
 {
 	t_data *vars;
 
-	if (ac == 5) {
+	if (ac == 5 || ac == 6) {
 		vars = malloc(sizeof(t_data));
 		if (!vars)
 		{
 			return (1);
 		}
 		parsing(&vars, av, ac);
+		if (vars->n_time_to_each_ph_to_eat == 0)
+			return (2);
 		init_mutex(&vars);
 		if (philo(vars, av))
 			return 1;
