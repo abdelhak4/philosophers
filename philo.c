@@ -14,6 +14,7 @@
 /*
  *
  		! "Note" TODO : handle max int and min int in ft_atoi.c
+ 		! todo : destroy mutexes!!
  *
  */
 

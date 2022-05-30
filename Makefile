@@ -1,9 +1,15 @@
 NAME = philo
 SRCS = philo.c\
 	ft_atoi.c philo_utlis.c habits.c
-$(NAME) : $(SRCS)
-	CC   $(SRCS)  -g -o $(NAME)
+
+CFLAGS = -Wall -Werror -Wextra
+
 all : $(NAME)
+
+$(NAME) : $(SRCS)
+	cc  $(SRCS) -o $(NAME)
 clean :
-	rm $(NAME)
-re : clean all
+	rm -f $(NAME)
+fclean : clean
+re : fclean all
+.PHONY: clean all clean re fclean

@@ -49,12 +49,12 @@ void	parsing(t_data **vars, char **av, int ac)
 	int j;
 
 	i = 1;
-	while (i < ac -1)
+	while (i < ac )
 	{
 		j = 0;
 		while (av[i][j])
 		{
-			if (!ft_isalpha(av[i][j]))
+			if (ft_isalpha(av[i][j]))
 			{
 				printf("hmm\n");
 				return;
