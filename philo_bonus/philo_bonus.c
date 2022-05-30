@@ -53,7 +53,7 @@ void	parsing(t_data **vars, char **av, int ac)
   //@ todo check if not someone is died ??//
   int	routine(t_data *data)
   {
-	int k = 15;
+	int k = 5;
 	while (k) {
 		is_eating(data, data->ph);
 		is_thinking(data, data->ph);
@@ -68,24 +68,36 @@ int	create_philo(t_data *data)
 {
 	pid_t	state;
 	pid_t	*re;
+	char	*ptr;
+	char	*sem;
 	int		i;
-	int 	j;
 
 	i = -1;
-	j = 0;
+	ptr = "semaphore1";
+	sem = "lock";
 	re = malloc(sizeof(pid_t) * data->n_of_ph);
 	if (!re)
 		return (4);
 	data->start_t = m_time();
-	data->sem = sem_open("semaphore", O_CREAT, 0644, data->n_of_ph);
-	data->lock = sem_open("lock", O_CREAT, 0644, 1);
+	sem_unlink(ptr);
+	sem_unlink(sem);
+	data->sem = sem_open(ptr, O_CREAT, 0644, data->n_of_ph);
+	if (data->sem == SEM_FAILED)
+		return -1;
+	data->lock = sem_open(sem, O_CREAT, 0644, 1);
 	while (++i < data->n_of_ph)
 	{
-		if ((re[i] = fork()) == -1)
+		if ((re[i] = fork()) == -1) {
 			printf("fork(): failed to creat child\n");
+		}
 		if (re[i] == 0)
 		{
+			sem_wait(data->lock);
+			data->ph = i;
+			sem_post(data->lock);
 			routine(data);
+			sem_unlink(ptr);
+			sem_unlink(sem);
 			return 0;
 		}
 		//usleep(100);

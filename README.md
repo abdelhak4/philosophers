@@ -2,7 +2,7 @@
 in this project I learn about multithreading
 and multiprocessing in c
 
-Some resourses for this project
+Some resources for this project
 
 [**race** **condition**](https://devopedia.org/race-condition-software)
 

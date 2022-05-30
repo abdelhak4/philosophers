@@ -23,29 +23,35 @@ void	print_msg(t_data *var, int ph, char *str, char *clr)
 
 void	is_eating(t_data *this, int ph)
 {
-	sem_wait(&this->sem[this->ph]);
-	sem_wait(&this->sem[(this->ph + 1) % this->n_of_ph]);
+	sem_wait(this->sem);
 	print_msg(this, ph, "has taken the left fork", YELLOW);
+	sem_wait(this->sem);
 	print_msg(this, ph, "has taken the right  fork", YELLOW);
 	//pthread_mutex_lock(&var->mut);
 	//var->s_ph[ph].last_eat = m_time() - var->start_t;
 	//pthread_mutex_unlock(&var->mut);
+	sem_wait(this->lock);
 	print_msg(this, ph, "is eating", GREEN);
+	sem_post(this->lock);
 	//pthread_mutex_lock(&var->mut);
 	//var->s_ph[ph].eat_times++;
 	//pthread_mutex_unlock(&var->mut);
 	my_usleep(this, this->time_to_eat);
-	sem_post(&this->sem[this->ph]);
-	sem_post(&this->sem[(this->ph + 1) % this->n_of_ph]);
+	sem_post(this->sem);
+	sem_post(this->sem);
 }
 
 void	is_sleeping(t_data *this, int ph)
 {
+	sem_wait(this->lock);
 	print_msg(this, ph, "is sleeping", PURPLE);
+	sem_post(this->lock);
 	my_usleep(this, this->time_to_sleep);
 }
 
 void	is_thinking(t_data *this, int ph)
 {
+	sem_wait(this->lock);
 	print_msg(this, ph, "is thinking", CYAN);
+	sem_post(this->lock);
 }
