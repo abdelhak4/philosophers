@@ -2,7 +2,7 @@ NAME = philo
 SRCS = philo_bonus.c\
 	ft_atoi.c semulation.c
 
-CFLAGS =  -lpthread
+CFLAGS =  -lpthread -fsanitize=thread -g
 
 bonus : $(NAME)
 

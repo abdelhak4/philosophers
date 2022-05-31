@@ -35,9 +35,11 @@ typedef struct s_ph_staffs
 	size_t			time_to_eat;
 	size_t			time_to_sleep;
 	size_t			r_fork;
+	int				is_died;
 	size_t			l_fork;
 	size_t			eat;
 	sem_t			*sem;
+	sem_t			*var;
 	sem_t			*lock;
 	size_t			eat_times;
 	size_t			ph;
@@ -48,7 +50,6 @@ typedef struct s_ph_staffs
 	!***********	F U N C T I O N S	*****************
 	*****************************************************/
 
-void	died(t_data *var, int i);
 void	my_usleep(t_data *var, time_t t);
 void	parsing(t_data **vars, char **av, int ac);
 int		ft_atoi(const char *str);

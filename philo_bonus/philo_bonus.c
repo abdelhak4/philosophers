@@ -50,17 +50,54 @@ void	parsing(t_data **vars, char **av, int ac)
 		(*vars)->n_time_to_each_ph_to_eat = -1;
 }
 
-  //@ todo check if not someone is died ??//
-  int	routine(t_data *data)
-  {
-	int k = 5;
-	while (k) {
+//@ todo check if not someone is died ??//
+void *rout(void *arg)
+{
+	int i;
+	t_data *this;
+
+	this = (t_data*)arg;
+	i = 0;
+	while (1)
+	{
+		if (i == this->n_of_ph)
+			i = 0;
+		sem_wait(this->var);
+		if (m_time() - this->start_t - this->last_eat >=
+			this->time_to_die)
+		{
+			sem_wait(this->lock);
+			this->is_died = 1;
+			printf("%s%ld ms {%lu} \"%s\"\n", RED, (m_time() - this->start_t), this->ph + 1,"is died");
+			kill(0, 2);
+			break;
+		}
+		sem_post(this->var);
+		usleep(100);
+		i++;
+	}
+	return NULL;
+}
+int	routine(t_data *data, int *pid)
+{
+	pthread_t	id;
+
+	if (pthread_create(&id, NULL, &rout, (void *)data) != 0)
+	{
+		printf("err in creating thread");
+		return 0;
+	}
+	while (1)
+	{
+		sem_wait(data->lock);
+		if (data->is_died == 1)
+			break;
+		sem_post(data->lock);
 		is_eating(data, data->ph);
 		is_thinking(data, data->ph);
 		is_sleeping(data, data->ph);
-		k--;
 	}
-	return 0;
+	return 1;
 }
 
 
@@ -81,7 +118,9 @@ int	create_philo(t_data *data)
 	data->start_t = m_time();
 	sem_unlink(ptr);
 	sem_unlink(sem);
+	sem_unlink("vars");
 	data->sem = sem_open(ptr, O_CREAT, 0644, data->n_of_ph);
+	data->var = sem_open("vars", O_CREAT, 0644, 1);
 	if (data->sem == SEM_FAILED)
 		return -1;
 	data->lock = sem_open(sem, O_CREAT, 0644, 1);
@@ -95,19 +134,13 @@ int	create_philo(t_data *data)
 			sem_wait(data->lock);
 			data->ph = i;
 			sem_post(data->lock);
-			routine(data);
+			routine(data, re);
 			sem_unlink(ptr);
 			sem_unlink(sem);
 			return 0;
 		}
-		//usleep(100);
+		usleep(100);
 	}
-//	if (re[i] == 0)// I am in the child process
-//	{
-//		sem_
-//		data->ph = i;
-//		routine(data);
-//	}
 	waitpid(-1, &state, 0);
 	return (2);
 }
