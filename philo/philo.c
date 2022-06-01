@@ -60,7 +60,7 @@ void	*rout(void	*arg)
 	return (NULL);
 }
 
-int	philo(t_data *vars, char **av)
+int	philo(t_data *vars)
 {
 	int			i;
 	pthread_t	*id;
@@ -73,8 +73,6 @@ int	philo(t_data *vars, char **av)
 	if (!vars->s_ph)
 		return (2);
 	(*vars).start_t = m_time();
-	(*vars).die = 0;
-	(*vars).is_died = 0;
 	while (++i < vars->n_of_philo)
 	{
 		vars->s_ph[i] = vars_init(vars, i);
@@ -86,6 +84,7 @@ int	philo(t_data *vars, char **av)
 		usleep (100);
 	}
 	check_for_die(vars);
+	destroy_mutex(vars);
 	return (0);
 }
 
@@ -126,7 +125,9 @@ int	main(int ac, char **av)
 			return (3);
 		if (init_mutex(&vars) != 0)
 			return (4);
-		if (philo(vars, av) != 0)
+		(*vars).die = 0;
+		(*vars).is_died = 0;
+		if (philo(vars) != 0)
 			return (5);
 	}
 	else

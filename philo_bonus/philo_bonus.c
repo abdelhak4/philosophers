@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo.c                                            :+:      :+:    :+:   */
+/*   philo_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ael-mous <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 20 22/04/17 15:42:17 by ael-mous          #+#    #+#             */
-/*   Updated: 2022/05/19 20:27:59 by ael-mous         ###   ########.fr       */
+/*   Created: 2022/06/01 15:37:17 by ael-mous          #+#    #+#             */
+/*   Updated: 2022/06/01 15:37:27 by ael-mous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,23 +22,22 @@ int	ft_isalpha(int c)
 
 void	parsing(t_data **vars, char **av, int ac)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
-	i = 1;
-	while (i < ac)
+	i = 0;
+	while (++i < ac)
 	{
 		j = 0;
 		while (av[i][j])
 		{
 			if (ft_isalpha(av[i][j]))
 			{
-				printf("hmm\n");
-				return;
+				printf("Error\n");
+				return ;
 			}
 			j++;
 		}
-		i++;
 	}
 	(*vars)->n_of_ph = ft_atoi(av[1]);
 	(*vars)->time_to_die = ft_atoi(av[2]);
@@ -50,57 +49,56 @@ void	parsing(t_data **vars, char **av, int ac)
 		(*vars)->n_time_to_each_ph_to_eat = -1;
 }
 
-//@ todo check if not someone is died ??//
-void *rout(void *arg)
+void	*rout(void *arg)
 {
-	int i;
-	t_data *this;
+	int		i;
+	t_data	*this;
 
-	this = (t_data*)arg;
+	this = (t_data *)arg;
 	i = 0;
 	while (1)
 	{
 		if (i == this->n_of_ph)
 			i = 0;
 		sem_wait(this->var);
-		if (m_time() - this->start_t - this->last_eat >=
-			this->time_to_die)
+		if (m_time() - this->start_t - this->last_eat
+			>= this->time_to_die)
 		{
 			sem_wait(this->lock);
 			this->is_died = 1;
 			printf("%s%ld ms {%lu} \"%s\"\n", RED, (m_time() - this->start_t),
-				   this->ph + 1,"is died");
+				this->ph + 1, "is died");
 			kill(0, 2);
-			break;
+			break ;
 		}
 		sem_post(this->var);
 		usleep(100);
 		i++;
 	}
-	return NULL;
+	return (NULL);
 }
-int	routine(t_data *data, int *pid)
+
+int	routine(t_data *data)
 {
 	pthread_t	id;
 
 	if (pthread_create(&id, NULL, &rout, (void *)data) != 0)
 	{
 		printf("err in creating thread");
-		return 0;
+		return (0);
 	}
 	while (1)
 	{
 		sem_wait(data->lock);
 		if (data->is_died == 1)
-			break;
+			break ;
 		sem_post(data->lock);
 		is_eating(data, data->ph);
 		is_thinking(data, data->ph);
 		is_sleeping(data, data->ph);
 	}
-	return 1;
+	return (1);
 }
-
 
 int	create_philo(t_data *data)
 {
@@ -115,7 +113,7 @@ int	create_philo(t_data *data)
 	sem = "lock";
 	re = malloc(sizeof(pid_t) * data->n_of_ph);
 	if (!re)
-		return (4);
+		return (1);
 	data->start_t = m_time();
 	sem_unlink(ptr);
 	sem_unlink(sem);
@@ -123,12 +121,15 @@ int	create_philo(t_data *data)
 	data->sem = sem_open(ptr, O_CREAT, 0644, data->n_of_ph);
 	data->var = sem_open("vars", O_CREAT, 0644, 1);
 	if (data->sem == SEM_FAILED)
-		return -1;
-	data->lock = sem_open(sem, O_CREAT, 0644, 1);
+		return (2);
+		data->lock = sem_open(sem, O_CREAT, 0644, 1);
 	while (++i < data->n_of_ph)
 	{
-		if ((re[i] = fork()) == -1) {
+		re[i] = fork();
+		if (re[i] == -1)
+		{
 			printf("fork(): failed to creat child\n");
+			return (3);
 		}
 		if (re[i] == 0)
 		{
@@ -138,19 +139,20 @@ int	create_philo(t_data *data)
 			routine(data, re);
 			sem_unlink(ptr);
 			sem_unlink(sem);
-			return 0;
+			return (4);
 		}
 		usleep(100);
 	}
 	waitpid(-1, &state, 0);
-	return (2);
+	return (0);
 }
 
 int	main(int ac, char **av)
 {
-	t_data *vars;
+	t_data	*vars;
 
-	if (ac == 5 || ac == 6) {
+	if (ac == 5 || ac == 6)
+	{
 		vars = malloc(sizeof(t_data));
 		if (!vars)
 		{
@@ -163,8 +165,3 @@ int	main(int ac, char **av)
 		printf("err arg should contains 5 args at least\n");
 	return (0);
 }
-
-
-
-
-

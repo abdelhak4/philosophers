@@ -10,6 +10,24 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "philo.h"
+
+void	destroy_mutex(t_data *vars)
+{
+	int	i;
+
+	i = 0;
+	pthread_mutex_destroy(&vars->lock);
+	pthread_mutex_destroy(&vars->mut);
+	pthread_mutex_destroy(&vars->sleep);
+	pthread_mutex_destroy(&vars->write);
+	while (i < vars->n_of_philo)
+	{
+		pthread_mutex_destroy(&vars->fork[i]);
+		i++;
+	}
+}
+
 static int	smallf(const char *str)
 {
 	int	i;

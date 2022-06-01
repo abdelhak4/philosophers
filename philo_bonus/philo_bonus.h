@@ -29,14 +29,14 @@
 
 typedef struct s_ph_staffs
 {
-	int 			n_of_ph;
+	int				n_of_ph;
 	time_t			start_t;
 	size_t			n_time_to_each_ph_to_eat;
 	size_t			time_to_die;
 	size_t			time_to_eat;
 	size_t			time_to_sleep;
 	size_t			r_fork;
-	atomic_size_t		is_died;
+	atomic_size_t	is_died;
 	size_t			l_fork;
 	size_t			eat;
 	sem_t			*sem;
@@ -44,7 +44,7 @@ typedef struct s_ph_staffs
 	sem_t			*lock;
 	size_t			eat_times;
 	size_t			ph;
-	atomic_size_t			last_eat;
+	atomic_size_t	last_eat;
 }	t_data;
 
 	/****************************************************

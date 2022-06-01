@@ -1,4 +1,4 @@
-NAME = philo
+NAME = philo_bonus
 SRCS = philo_bonus.c\
 	ft_atoi.c semulation.c
 
