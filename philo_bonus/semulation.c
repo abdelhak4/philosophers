@@ -17,8 +17,10 @@ time_t	m_time()
 
 void	print_msg(t_data *var, int ph, char *str, char *clr)
 {
+	sem_wait(var->lock);
 	printf("%s%ld ms {%d} \"%s\"\n",clr , (m_time() - var->start_t),
 		   ph + 1, str);
+	sem_post(var->lock);
 }
 
 void	is_eating(t_data *this, int ph)
@@ -41,9 +43,8 @@ void	is_eating(t_data *this, int ph)
 
 void	is_sleeping(t_data *this, int ph)
 {
-	sem_wait(this->lock);
+
 	print_msg(this, ph, "is sleeping", PURPLE);
-	sem_post(this->lock);
 	my_usleep(this, this->time_to_sleep);
 }
 

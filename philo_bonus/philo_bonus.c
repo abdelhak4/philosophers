@@ -68,7 +68,8 @@ void *rout(void *arg)
 		{
 			sem_wait(this->lock);
 			this->is_died = 1;
-			printf("%s%ld ms {%lu} \"%s\"\n", RED, (m_time() - this->start_t), this->ph + 1,"is died");
+			printf("%s%ld ms {%lu} \"%s\"\n", RED, (m_time() - this->start_t),
+				   this->ph + 1,"is died");
 			kill(0, 2);
 			break;
 		}

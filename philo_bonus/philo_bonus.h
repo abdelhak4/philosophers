@@ -20,6 +20,7 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <signal.h>
+# include <stdatomic.h>
 # define RED "\033[0;31m"
 # define YELLOW "\e[1;33m"
 # define CYAN "\e[0;36m"
@@ -35,7 +36,7 @@ typedef struct s_ph_staffs
 	size_t			time_to_eat;
 	size_t			time_to_sleep;
 	size_t			r_fork;
-	int				is_died;
+	atomic_size_t		is_died;
 	size_t			l_fork;
 	size_t			eat;
 	sem_t			*sem;
@@ -43,7 +44,7 @@ typedef struct s_ph_staffs
 	sem_t			*lock;
 	size_t			eat_times;
 	size_t			ph;
-	time_t			last_eat;
+	atomic_size_t			last_eat;
 }	t_data;
 
 	/****************************************************

@@ -1,9 +1,28 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   habits.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ael-mous <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/01 11:04:22 by ael-mous          #+#    #+#             */
+/*   Updated: 2022/06/01 11:04:25 by ael-mous         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 /*
  ?  contains vars_init
  ?	is_eating and is_sleeping , is_thinking
  ?	and check_for_die
  */
+time_t	m_time(void)
+{
+	struct timeval	time;
+
+	gettimeofday(&time, NULL);
+	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
+}
 
 void	is_eating(t_data *var, int ph)
 {
@@ -21,7 +40,6 @@ void	is_eating(t_data *var, int ph)
 	my_usleep(var, var->time_to_eat);
 	pthread_mutex_unlock(&var->fork[var->s_ph[ph].l_fork]);
 	pthread_mutex_unlock(&var->fork[var->s_ph[ph].r_fork]);
-
 }
 
 void	is_sleeping(t_data *var, int ph)
@@ -30,27 +48,21 @@ void	is_sleeping(t_data *var, int ph)
 	my_usleep(var, var->time_to_sleep);
 }
 
-void	is_thinking(t_data *var, int ph)
+int	all_eat(t_data *var)
 {
-	print_msg(var, ph, "is thinking", CYAN);
-}
-
-int all_eat(t_data *var)
-{
-	int i;
+	int	i;
 
 	i = 0;
 	while (i < var->n_of_philo)
 	{
 		if (var->s_ph[i].eat_times < var->n_time_to_each_ph_to_eat)
-		{
 			return (1);
-		}
 		i++;
 	}
 	return (0);
 }
-void check_for_die(t_data *var)
+
+void	check_for_die(t_data *var)
 {
 	int	i;
 
@@ -60,13 +72,13 @@ void check_for_die(t_data *var)
 		while (i < var->n_of_philo)
 		{
 			pthread_mutex_lock(&var->mut);
-			if (m_time() - var->start_t - var->s_ph[i].last_eat >=
-				var->time_to_die)
+			if ((m_time() - var->start_t - var->s_ph[i].last_eat)
+				>= var->time_to_die)
 			{
 				pthread_mutex_lock(&var->write);
 				var->is_died = 1;
 				printf("%s%ld ms {%d} \"%s\"\n", RED, (m_time() - var->start_t),
-					   i + 1, " is died");
+					i + 1, " is died");
 				usleep(100);
 				return ;
 			}

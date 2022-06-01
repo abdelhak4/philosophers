@@ -6,7 +6,7 @@
 /*   By: ael-mous <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 15:42:32 by ael-mous          #+#    #+#             */
-/*   Updated: 2022/04/17 15:42:34 by ael-mous         ###   ########.fr       */
+/*   Updated: 2022/06/01 10:51:26 by ael-mous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ typedef struct s_ph_staffs
 	pthread_mutex_t	mut;
 	pthread_mutex_t	sleep;
 	int				die;
-	int 			is_died;
+	int				is_died;
 	size_t			n_time_to_each_ph_to_eat;
 	size_t			time_to_die;
 	size_t			time_to_eat;
@@ -64,14 +64,15 @@ typedef struct s_ph_staffs
 	*****************************************************/
 
 void	died(t_data *var, int i);
+int		ft_isalpha(int c);
+int		check_arg(char **av, int ac);
 void	my_usleep(t_data *var, time_t t);
 t_ph	vars_init(t_data *vars, int i);
-void	parsing(t_data **vars, char **av, int ac);
+int		parsing(t_data **vars, char **av, int ac);
 int		ft_atoi(const char *str);
 void	print_msg(t_data *var, int ph, char *str, char *clr);
 time_t	m_time(void);
 void	check_for_die(t_data *var);
-void	is_thinking(t_data *var, int ph);
 void	is_sleeping(t_data *var, int ph);
 void	is_eating(t_data *var, int ph);
 

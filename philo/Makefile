@@ -7,7 +7,7 @@ CFLAGS = -Wall -Werror -Wextra
 all : $(NAME)
 
 $(NAME) : $(SRCS)
-	cc  $(SRCS) -o $(NAME)
+	cc  $(SRCS) -g -o $(NAME)
 clean :
 	rm -f $(NAME)
 fclean : clean
