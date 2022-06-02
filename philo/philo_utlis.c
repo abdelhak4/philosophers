@@ -35,12 +35,11 @@ t_ph	vars_init(t_data *vars, int i)
 	vars->s_ph[i].l_fork = i;
 	vars->s_ph[i].eat = 0;
 	vars->s_ph[i].eat_times = 0;
-	vars->s_ph[i].last_eat = 0;
 	pthread_mutex_unlock(&vars->mut);
 	return (vars->s_ph[i]);
 }
 
-void	my_usleep(t_data *var, time_t t)
+void	my_usleep(time_t t)
 {
 	time_t	t0;
 

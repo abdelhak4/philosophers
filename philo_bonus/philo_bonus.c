@@ -49,7 +49,14 @@ void	parsing(t_data **vars, char **av, int ac)
 		(*vars)->n_time_to_each_ph_to_eat = -1;
 }
 
-void	*rout(void *arg)
+int	all_eat(t_data *var)
+{
+	if (var->eat_times > var->n_time_to_each_ph_to_eat)
+		return (1);
+	return (0);
+}
+
+void	*rout_for_check_died(void *arg)
 {
 	int		i;
 	t_data	*this;
@@ -82,7 +89,7 @@ int	routine(t_data *data)
 {
 	pthread_t	id;
 
-	if (pthread_create(&id, NULL, &rout, (void *)data) != 0)
+	if (pthread_create(&id, NULL, &rout_for_check_died, (void *)data) != 0)
 	{
 		printf("err in creating thread");
 		return (0);
@@ -90,55 +97,54 @@ int	routine(t_data *data)
 	while (1)
 	{
 		sem_wait(data->lock);
-		if (data->is_died == 1)
-			break ;
 		sem_post(data->lock);
 		is_eating(data, data->ph);
-		is_thinking(data, data->ph);
+		if (all_eat(data))
+		{
+			kill(0, SIGKILL);
+			exit(EXIT_SUCCESS);
+		}
 		is_sleeping(data, data->ph);
 	}
 	return (1);
+}
+void init(t_data *data, pid_t **re)
+{
+	*re = malloc(sizeof(pid_t) * data->n_of_ph);
+	if (!(*re))
+		exit(EXIT_FAILURE);
+	data->start_t = m_time();
+	sem_unlink("open");
+	sem_unlink("sem");
+	sem_unlink("vars");
+	data->sem = sem_open("open", O_CREAT | O_EXCL, 0644, data->n_of_ph);
+	data->var = sem_open("vars", O_CREAT | O_EXCL, 0644, 1);
+	data->lock = sem_open("sem", O_CREAT | O_EXCL, 0644, 1);
+	if (data->sem == SEM_FAILED || data->var == SEM_FAILED
+		|| data->lock == SEM_FAILED)
+		exit(EXIT_FAILURE);
 }
 
 int	create_philo(t_data *data)
 {
 	pid_t	state;
 	pid_t	*re;
-	char	*ptr;
-	char	*sem;
 	int		i;
 
 	i = -1;
-	ptr = "semaphore1";
-	sem = "lock";
-	re = malloc(sizeof(pid_t) * data->n_of_ph);
-	if (!re)
-		return (1);
-	data->start_t = m_time();
-	sem_unlink(ptr);
-	sem_unlink(sem);
-	sem_unlink("vars");
-	data->sem = sem_open(ptr, O_CREAT, 0644, data->n_of_ph);
-	data->var = sem_open("vars", O_CREAT, 0644, 1);
-	if (data->sem == SEM_FAILED)
-		return (2);
-		data->lock = sem_open(sem, O_CREAT, 0644, 1);
+	init(data, &re);
 	while (++i < data->n_of_ph)
 	{
 		re[i] = fork();
 		if (re[i] == -1)
 		{
 			printf("fork(): failed to creat child\n");
-			return (3);
+			exit(EXIT_FAILURE);
 		}
 		if (re[i] == 0)
 		{
-			sem_wait(data->lock);
 			data->ph = i;
-			sem_post(data->lock);
-			routine(data, re);
-			sem_unlink(ptr);
-			sem_unlink(sem);
+			routine(data);
 			return (4);
 		}
 		usleep(100);
@@ -159,7 +165,13 @@ int	main(int ac, char **av)
 			return (1);
 		}
 		parsing(&vars, av, ac);
+		if (vars->n_time_to_each_ph_to_eat == 0)
+			return (3);
+		vars->eat_times = 0;
 		create_philo(vars);
+		sem_unlink("open");
+		sem_unlink("vars");
+		sem_unlink("sem");
 	}
 	else
 		printf("err arg should contains 5 args at least\n");

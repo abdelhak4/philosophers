@@ -45,11 +45,9 @@ void	is_eating(t_data *this, int ph)
 	sem_wait(this->var);
 	this->last_eat = m_time() - this->start_t;
 	sem_post(this->var);
-	sem_wait(this->lock);
 	print_msg(this, ph, "is eating", GREEN);
-	sem_post(this->lock);
-	/*var->s_ph[ph].eat_times++;*/
-	my_usleep(this, this->time_to_eat);
+	this->eat_times++;
+	my_usleep(this->time_to_eat);
 	sem_post(this->sem);
 	sem_post(this->sem);
 }
@@ -57,12 +55,6 @@ void	is_eating(t_data *this, int ph)
 void	is_sleeping(t_data *this, int ph)
 {
 	print_msg(this, ph, "is sleeping", PURPLE);
-	my_usleep(this, this->time_to_sleep);
-}
-
-void	is_thinking(t_data *this, int ph)
-{
-	sem_wait(this->lock);
+	my_usleep(this->time_to_sleep);
 	print_msg(this, ph, "is thinking", CYAN);
-	sem_post(this->lock);
 }

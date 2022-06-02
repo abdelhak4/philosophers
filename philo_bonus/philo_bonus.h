@@ -51,13 +51,12 @@ typedef struct s_ph_staffs
 	!***********	F U N C T I O N S	*****************
 	*****************************************************/
 
-void	my_usleep(t_data *var, time_t t);
+void	my_usleep(time_t t);
 void	parsing(t_data **vars, char **av, int ac);
 int		ft_atoi(const char *str);
 void	print_msg(t_data *var, int ph, char *str, char *clr);
 time_t	m_time(void);
 void	check_for_die(t_data *var);
-void	is_thinking(t_data *var, int ph);
 void	is_sleeping(t_data *var, int ph);
 void	is_eating(t_data *var, int ph);
 
