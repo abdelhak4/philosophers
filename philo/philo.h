@@ -67,7 +67,7 @@ void	died(t_data *var, int i);
 int		ft_isalpha(int c);
 void	destroy_mutex(t_data *vars);
 int		check_arg(char **av, int ac);
-void	my_usleep(t_data *var, time_t t);
+void	my_usleep(time_t t);
 t_ph	vars_init(t_data *vars, int i);
 int		parsing(t_data **vars, char **av, int ac);
 int		ft_atoi(const char *str);

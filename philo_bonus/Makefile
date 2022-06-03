@@ -1,8 +1,10 @@
 NAME = philo_bonus
 SRCS = philo_bonus.c\
-	ft_atoi.c semulation.c
+	ft_atoi.c\
+	semulation_bonus.c\
+	utils_bonus.c
 
-CFLAGS =  -lpthread
+CFLAGS =  -Wall -Werror -Wextra -lpthread
 
 bonus : $(NAME)
 

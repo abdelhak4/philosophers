@@ -12,14 +12,6 @@
 
 #include "philo_bonus.h"
 
-int	ft_isalpha(int c)
-{
-	if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122))
-		return (1);
-	else
-		return (0);
-}
-
 void	parsing(t_data **vars, char **av, int ac)
 {
 	int	i;
@@ -34,7 +26,7 @@ void	parsing(t_data **vars, char **av, int ac)
 			if (ft_isalpha(av[i][j]))
 			{
 				printf("Error\n");
-				return ;
+				exit(EXIT_FAILURE);
 			}
 			j++;
 		}
@@ -47,13 +39,6 @@ void	parsing(t_data **vars, char **av, int ac)
 		(*vars)->n_time_to_each_ph_to_eat = ft_atoi(av[5]);
 	else
 		(*vars)->n_time_to_each_ph_to_eat = -1;
-}
-
-int	all_eat(t_data *var)
-{
-	if (var->eat_times > var->n_time_to_each_ph_to_eat)
-		return (1);
-	return (0);
 }
 
 void	*rout_for_check_died(void *arg)
@@ -76,23 +61,21 @@ void	*rout_for_check_died(void *arg)
 			printf("%s%ld ms {%lu} \"%s\"\n", RED, (m_time() - this->start_t),
 				this->ph + 1, "is died");
 			kill(0, 2);
-			break ;
 		}
 		sem_post(this->var);
 		usleep(100);
 		i++;
 	}
-	return (NULL);
 }
 
-int	routine(t_data *data)
+void	routine(t_data *data)
 {
 	pthread_t	id;
 
 	if (pthread_create(&id, NULL, &rout_for_check_died, (void *)data) != 0)
 	{
 		printf("err in creating thread");
-		return (0);
+		exit(EXIT_FAILURE);
 	}
 	while (1)
 	{
@@ -101,28 +84,12 @@ int	routine(t_data *data)
 		is_eating(data, data->ph);
 		if (all_eat(data))
 		{
+			close_sem(data);
 			kill(0, SIGKILL);
 			exit(EXIT_SUCCESS);
 		}
 		is_sleeping(data, data->ph);
 	}
-	return (1);
-}
-void init(t_data *data, pid_t **re)
-{
-	*re = malloc(sizeof(pid_t) * data->n_of_ph);
-	if (!(*re))
-		exit(EXIT_FAILURE);
-	data->start_t = m_time();
-	sem_unlink("open");
-	sem_unlink("sem");
-	sem_unlink("vars");
-	data->sem = sem_open("open", O_CREAT | O_EXCL, 0644, data->n_of_ph);
-	data->var = sem_open("vars", O_CREAT | O_EXCL, 0644, 1);
-	data->lock = sem_open("sem", O_CREAT | O_EXCL, 0644, 1);
-	if (data->sem == SEM_FAILED || data->var == SEM_FAILED
-		|| data->lock == SEM_FAILED)
-		exit(EXIT_FAILURE);
 }
 
 int	create_philo(t_data *data)
@@ -161,9 +128,7 @@ int	main(int ac, char **av)
 	{
 		vars = malloc(sizeof(t_data));
 		if (!vars)
-		{
 			return (1);
-		}
 		parsing(&vars, av, ac);
 		if (vars->n_time_to_each_ph_to_eat == 0)
 			return (3);
@@ -172,6 +137,7 @@ int	main(int ac, char **av)
 		sem_unlink("open");
 		sem_unlink("vars");
 		sem_unlink("sem");
+		close_sem(vars);
 	}
 	else
 		printf("err arg should contains 5 args at least\n");

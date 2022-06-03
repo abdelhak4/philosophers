@@ -2,7 +2,7 @@ NAME = philo
 SRCS = philo.c\
 	ft_atoi.c philo_utlis.c habits.c
 
-CFLAGS = -Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra -lpthread
 
 all : $(NAME)
 

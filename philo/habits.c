@@ -37,7 +37,7 @@ void	is_eating(t_data *var, int ph)
 	pthread_mutex_lock(&var->mut);
 	var->s_ph[ph].eat_times++;
 	pthread_mutex_unlock(&var->mut);
-	my_usleep(var, var->time_to_eat);
+	my_usleep(var->time_to_eat);
 	pthread_mutex_unlock(&var->fork[var->s_ph[ph].l_fork]);
 	pthread_mutex_unlock(&var->fork[var->s_ph[ph].r_fork]);
 }
@@ -45,7 +45,7 @@ void	is_eating(t_data *var, int ph)
 void	is_sleeping(t_data *var, int ph)
 {
 	print_msg(var, ph, "is sleeping", PURPLE);
-	my_usleep(var, var->time_to_sleep);
+	my_usleep(var->time_to_sleep);
 }
 
 int	all_eat(t_data *var)
